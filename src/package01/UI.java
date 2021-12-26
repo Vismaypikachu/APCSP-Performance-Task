@@ -3,12 +3,15 @@ package package01;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Scanner;
 
 import javax.swing.JButton;
@@ -34,9 +37,9 @@ public class UI {
 	JLabel titleNameLabel;
 	JTextArea resultsArea;
 	JTextField jtf;
-	
+
 	JButton[] saveButtons = new JButton[5];
-	
+
 	InputHandler inHandler = new InputHandler();
 
 	public UI(game g) {
@@ -58,12 +61,24 @@ public class UI {
 
 		createFont();
 		createUIComponent();
-		
+
 		window.setVisible(true);
 	}
 
 	public void createFont() {
-		titleFont = new Font("Ever After", Font.PLAIN, 63);
+		try {
+			InputStream is = getClass().getClassLoader().getResourceAsStream("everafter.ttf");
+			titleFont = Font.createFont(Font.TRUETYPE_FONT, is);
+			titleFont = titleFont.deriveFont(Font.PLAIN, 63F);
+		} catch (FontFormatException e) {
+			titleFont = new Font("Times New Roman", Font.PLAIN, 45);
+			e.printStackTrace();
+		} catch (IOException e) {
+			titleFont = new Font("Times New Roman", Font.PLAIN, 45);
+			e.printStackTrace();
+		}
+
+
 		normalFont = new Font("Times New Roman", Font.PLAIN, 22);
 	}
 
@@ -83,9 +98,9 @@ public class UI {
 		titleNameLabel.setFont(normalFont);
 
 		titleNamePanel.setVisible(true);
-		
+
 		//input panel
-		
+
 		inputPanel = new JPanel();
 		inputPanel.setBounds(100, 300, 600, 100);
 		inputPanel.setBackground(Color.black);
@@ -94,7 +109,7 @@ public class UI {
 		jtf = new JTextField();
 		jtf.setFont(normalFont);
 		inputPanel.add(jtf);
-		
+
 		submitButton = new JButton("New Save (your name)");
 		submitButton.setFont(normalFont);
 		submitButton.setBackground(Color.black);
@@ -103,20 +118,20 @@ public class UI {
 		submitButton.setFocusPainted(false);
 		submitButton.addActionListener(inHandler);
 		inputPanel.add(submitButton);
-		
+
 		currentPlayer = new JLabel("Current Player: ", JLabel.RIGHT);
 		currentPlayer.setFont(normalFont);
 		currentPlayer.setBackground(Color.black);
 		currentPlayer.setForeground(Color.white);
-		
+
 		currentPlayerName = new JLabel(""+Constants.currentPlayer, JLabel.LEFT);
 		currentPlayerName.setFont(normalFont);
 		currentPlayerName.setBackground(Color.black);
 		currentPlayerName.setForeground(Color.white);
-		
+
 		inputPanel.add(currentPlayer);
 		inputPanel.add(currentPlayerName);
-		
+
 		con.add(inputPanel);
 
 		//start button
@@ -132,7 +147,7 @@ public class UI {
 		startButton.setFocusPainted(false);
 		startButton.addActionListener(m_game.m_cHandler);
 		startButton.setActionCommand("start");
-		
+
 		loadButton = new JButton("LOAD");
 		loadButton.setForeground(Color.white);
 		loadButton.setBackground(Color.black);
@@ -153,12 +168,12 @@ public class UI {
 
 	public void createGameScreen() {
 		window.addKeyListener(m_game.m_kHandler);
-		
+
 		typingAreaPanel = new JPanel();
 		typingAreaPanel.setBounds(100, 100, 600, 200);
 		typingAreaPanel.setLayout(new GridLayout(3,30));
 		typingAreaPanel.setBackground(Color.black);
-		
+
 		for(int i = 0; i < m_game.m_mechanics.charArr.length; i++) {
 			m_game.m_mechanics.charArr[i] = new JLabel("A");
 			m_game.m_mechanics.charArr[i].setBackground(Color.black);
@@ -167,13 +182,13 @@ public class UI {
 			m_game.m_mechanics.charArr[i].setFont(normalFont);
 			typingAreaPanel.add(m_game.m_mechanics.charArr[i]);
 		}
-		
+
 		con.add(typingAreaPanel);
-		
+
 		resultsAreaPanel = new JPanel();
 		resultsAreaPanel.setBounds(100, 350, 600, 150);
 		resultsAreaPanel.setBackground(Color.black);
-		
+
 		resultsArea = new JTextArea("Test in progress, please type the letter in white to continue. Accuracy is based on how many characters are typed correctly.");
 		resultsArea.setBounds(100, 350, 600, 150);
 		resultsArea.setBackground(Color.black);
@@ -182,13 +197,13 @@ public class UI {
 		resultsArea.setWrapStyleWord(true);
 		resultsArea.setEditable(false);
 		resultsArea.setFont(normalFont);
-		
+
 		resultsAreaPanel.add(resultsArea);
-		
+
 		backButtonPanel = new JPanel();
 		backButtonPanel.setBounds(350, 500, 100, 100);
 		backButtonPanel.setBackground(Color.black);
-		
+
 		backButton = new JButton("BACK");
 		backButton.setForeground(Color.white);
 		backButton.setBackground(Color.black);
@@ -196,9 +211,9 @@ public class UI {
 		backButton.setFocusPainted(false);
 		backButton.addActionListener(m_game.m_cHandler);
 		backButton.setActionCommand("back");
-		
+
 		backButtonPanel.add(backButton);
-		
+
 		con.add(resultsAreaPanel);
 		con.add(backButtonPanel);
 	}
@@ -218,11 +233,11 @@ public class UI {
 		loadPanel.setBounds(240, 100, 300, 300);
 		loadPanel.setBackground(Color.black);
 		loadPanel.setLayout(new GridLayout(5,1));
-		
+
 		//initialize first list
 		jtf.setText(null);
 		m_game.m_mechanics.createNewSave(1);
-				
+
 		for(int i = 0; i < saveButtons.length; i++) {
 			if(i < Constants.list.length) saveButtons[i] = new JButton(Constants.list[i]);
 			else saveButtons[i] = new JButton("Empty");
@@ -233,25 +248,25 @@ public class UI {
 			saveButtons[i].setFocusPainted(false);
 			saveButtons[i].addActionListener(m_game.m_cHandler);
 			saveButtons[i].setActionCommand(""+i);		
-			
+
 			loadPanel.add(saveButtons[i]);
 		}
-		
+
 		con.add(loadPanel);
-		
+
 		navigationPanel = new JPanel();	
 		navigationPanel.setBounds(540, 100, 70, 300);
 		navigationPanel.setBackground(Color.black);
 		navigationPanel.setLayout(new GridLayout(3,1));
-		
+
 		con.add(navigationPanel);
-		
+
 		navigationLabel = new JLabel("Scroll", JLabel.CENTER);
 		navigationLabel.setForeground(Color.white);
 		navigationLabel.setBackground(Color.black);
 		navigationLabel.setFont(normalFont);
 		navigationPanel.add(navigationLabel);
-		
+
 		pgUpButton = new JButton("/\\");
 		pgUpButton.setForeground(Color.white);
 		pgUpButton.setBackground(Color.black);
@@ -261,7 +276,7 @@ public class UI {
 		pgUpButton.addActionListener(m_game.m_cHandler);
 		pgUpButton.setActionCommand("up");
 		navigationPanel.add(pgUpButton);
-		
+
 		pgDownButton = new JButton("\\/");
 		pgDownButton.setForeground(Color.white);
 		pgDownButton.setBackground(Color.black);
@@ -271,11 +286,11 @@ public class UI {
 		pgDownButton.addActionListener(m_game.m_cHandler);
 		pgDownButton.setActionCommand("down");
 		navigationPanel.add(pgDownButton);
-		
+
 		backButtonPanel = new JPanel();
 		backButtonPanel.setBounds(350, 450, 100, 100);
 		backButtonPanel.setBackground(Color.black);
-		
+
 		backButton = new JButton("BACK");
 		backButton.setForeground(Color.white);
 		backButton.setBackground(Color.black);
@@ -284,10 +299,10 @@ public class UI {
 		backButton.addActionListener(m_game.m_cHandler);
 		backButton.setActionCommand("back2");
 		backButtonPanel.add(backButton);
-		
+
 		con.add(backButtonPanel);
 	}
-	
+
 	public int howManySaves() {
 		int x = 0;
 		try {
@@ -300,7 +315,7 @@ public class UI {
 		catch(Exception e) {}
 		return x;
 	}
-	
+
 	public class InputHandler implements ActionListener{
 		public void actionPerformed(ActionEvent event) {
 			Constants.currentPlayer = jtf.getText();

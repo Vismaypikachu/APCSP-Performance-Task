@@ -25,7 +25,7 @@ public class game {
 		public void actionPerformed(ActionEvent event) {
 			String yourChoice = event.getActionCommand();
 			switch(yourChoice) {
-				case "start": Constants.resetConstants(); try{m_ui.window.removeKeyListener(m_kHandler);}catch(Exception e) {} m_mechanics.chooseRandomSentence(); m_vm.hideTitleScreen(); Constants.gameModeEnabled = true; m_ui.createGameScreen(); m_update.startGameThread(); m_mechanics.simpleTimer(); break;
+				case "start": if(!Constants.currentPlayer.equals("")) {Constants.resetConstants(); try{m_ui.window.removeKeyListener(m_kHandler);}catch(Exception e) {} m_mechanics.chooseRandomSentence(); m_vm.hideTitleScreen(); Constants.gameModeEnabled = true; m_ui.createGameScreen(); m_update.startGameThread(); m_mechanics.simpleTimer();} break;
 				case "load": m_ui.createLoadScreen(); m_vm.showLoadScreen(); break;
 				case "back": m_vm.hideGameScreen(); m_vm.showTitleScreen(); break;
 				case "back2": m_vm.hideLoadScreen(); m_vm.showTitleScreen(); break;
